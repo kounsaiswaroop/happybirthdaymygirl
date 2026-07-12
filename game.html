@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Love Tiles</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: linear-gradient(to right, #ffecd2, #fcb69f);
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px 12px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #d6336c;
+      margin-bottom: 20px;
+    }
+
+    #game {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(60px, 80px));
+      gap: 12px;
+      max-width: 100%;
+    }
+
+    .tile {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #fff0f5;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ff69b4;
+      font-size: clamp(22px, 6vw, 36px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    @media (max-width: 400px) {
+      #game { grid-template-columns: repeat(4, minmax(50px, 1fr)); gap: 8px; }
+    }
+
+    .matched {
+      background: #ffe6f0;
+      box-shadow: none;
+      cursor: default;
+    }
+
+    #finalMessage {
+      display: none;
+      margin-top: 30px;
+      font-size: 22px;
+      color: #d6336c;
+      background: #fff0f5;
+      padding: 15px 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px #ff69b4;
+    }
+  </style>
+</head>
+<body>
+  <h1>💘 Love Tiles</h1>
+  <div id="game"></div>
+  <div id="finalMessage">You matched every piece of my heart 💖</div>
+
+  <script>
+    const emojis = ['💖','🌸','😘','💕','😍','🌷','💖','🌸','😘','💕','😍','🌷'];
+    const game = document.getElementById('game');
+    const finalMessage = document.getElementById('finalMessage');
+    let firstTile = null;
+    let lockBoard = false;
+    let matchedCount = 0;
+
+    // Shuffle emojis
+    emojis.sort(() => 0.5 - Math.random());
+
+    emojis.forEach((emoji, index) => {
+      const tile = document.createElement('div');
+      tile.classList.add('tile');
+      tile.dataset.emoji = emoji;
+      tile.dataset.index = index;
+      tile.textContent = '';
+      game.appendChild(tile);
+
+      tile.addEventListener('click', () => {
+        if (lockBoard || tile.classList.contains('matched') || tile === firstTile) return;
+
+        tile.textContent = emoji;
+
+        if (!firstTile) {
+          firstTile = tile;
+        } else {
+          lockBoard = true;
+          if (tile.dataset.emoji === firstTile.dataset.emoji) {
+            tile.classList.add('matched');
+            firstTile.classList.add('matched');
+            matchedCount += 2;
+            firstTile = null;
+            lockBoard = false;
+            if (matchedCount === emojis.length) {
+              finalMessage.style.display = 'block';
+            }
+          } else {
+            setTimeout(() => {
+              tile.textContent = '';
+              firstTile.textContent = '';
+              firstTile = null;
+              lockBoard = false;
+            }, 800);
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
